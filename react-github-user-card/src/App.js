@@ -1,41 +1,52 @@
-import React, { Component } from 'react';
-import UserList from './components/UserList';
-import FollowersList from './components/FollowersList'
-import axios from 'axios';
+import React from 'react';
 import './App.css';
+import UserCard from './components/UserCard';
+import FollowerCard from './components/FollowerCard';
+import axios from 'axios';
 
-class App extends Component {
-
-  state = {
-    user: [],
-    followers: []
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      user: {},
+      followers: []
+    }
   }
-  
-  componentDidMount() {
-    axios.get(`https://api.github.com/users/lateralcreativity`)
-    .then(res => {
-      this.setState({
-        user: [...this.state.user, res.data]
-      })
-    })
-    .catch(err => console.log('Error', err))
 
-    axios.get(`https://api.github.com/users/lateralcreativity/followers`)
-    .then(res => {
+  componentDidMount() {
+    axios.get('https://api.github.com/users/lateralcreativity')
+    .then(response => {
       this.setState({
-        followers: [...this.state.followers, ...res.data]
+        user: {...response.data}
       })
     })
-    .catch(err => console.log('Error', err))
+    .catch(error => {
+      console.log(error);
+    });
+
+    axios.get('https://api.github.com/users/lateralcreativity/followers')
+    .then(response => {
+      this.setState({
+        followers: [...response.data]
+      })
+    })
+    .catch(error => {
+      console.log(error);
+    });
   }
 
   render() {
     return (
-      <div>
-        <UserList userData={this.state.user} />
-        <FollowersList followerData={this.state.followers} />
+      <div className="App">
+        <h1>Github User Card</h1>
+        <UserCard user={this.state.user}/>
+        {this.state.followers.map(follower => {
+          return (
+            <FollowerCard follower={follower}/>
+          )
+        })}
       </div>
-    )
+    );
   }
 }
 
